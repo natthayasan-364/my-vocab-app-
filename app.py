@@ -78,7 +78,7 @@ if mode == "📖 เรียนรู้คำศัพท์":
         c1.subheader(f"{w['word']} ({w['level']}) - {w['pos']}")
         if c2.button("🔊 ฟังเสียง"): speak(w['word'])
         
-        t1, t2, t3 = st.tabs(["ความหมาย", "Synonyms/Antonyms", "ตัวอย่าง"])
+    t1, t2, t3 = st.tabs(["ความหมาย", "Synonyms/Antonyms", "ตัวอย่าง"])
         with t1:
             st.write(f"🇹🇭 {w['def_th']}")
             st.write(f"🇺🇸 {w['def_en']}")
@@ -87,18 +87,15 @@ if mode == "📖 เรียนรู้คำศัพท์":
             s_col1.write(f"✅ Synonyms: {w['synonyms']}")
             if s_col2.button("🔊", key="s_voice"):
                 speak(w['synonyms'])
-            
             st.divider()
-            
             a_col1, a_col2 = st.columns([4, 1])
             a_col1.write(f"❌ Antonyms: {w['antonyms']}")
             if a_col2.button("🔊", key="a_voice"):
                 speak(w['antonyms'])
-y="ant_btn"): 
-                speak(w['antonyms'])
         with t3:
             st.info(w['example'])
-            if st.button("🔊 อ่านตัวอย่าง"): speak(w['example'])
+            if st.button("🔊 อ่านตัวอย่าง", key="ex_voice"):
+                speak(w['example'])
 
 # --- 8. โหมดทำแบบทดสอบ ---
 elif mode == "🧠 ทำแบบทดสอบ":
