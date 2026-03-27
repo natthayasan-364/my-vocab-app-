@@ -1,156 +1,146 @@
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
-from gtts import gTTS
 import pandas as pd
+from gtts import gTTS
 import base64
 import io
 import random
 from datetime import datetime
 
-# --- 1. ตั้งค่าหน้าจอและสไตล์ ---
-st.set_page_config(page_title="CEFR Vocab Hero Pro", page_icon="🏆", layout="wide")
+# --- 1. การตั้งค่าเบื้องต้น ---
+st.set_page_config(page_title="CEFR Vocab Hero", page_icon="🏆", layout="wide")
 
-# --- 2. การเชื่อมต่อ Google Sheets (ใส่ URL ของคุณที่นี่) ---
-# หมายเหตุ: หากยังไม่มี URL ให้ใช้ไฟล์ vocab.csv ที่อัปโหลดขึ้น GitHub แทนได้
-GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/your-id-here/edit#gid=0"
+# สไตล์ CSS เพิ่มเติมเพื่อให้ดูสวยขึ้น
+st.markdown("""
+    <style>
+    .main { background-color: #f5f7f9; }
+    .stButton>button { width: 100%; border-radius: 10px; }
+    .stTabs [data-baseweb="tab-list"] { gap: 10px; }
+    </style>
+    """, unsafe_allow_html=True)
 
-# --- 3. เริ่มต้น Session State (เก็บข้อมูลชั่วคราวขณะเล่น) ---
-if 'score' not in st.session_state: st.session_state.score = 0
-if 'streak' not in st.session_state: st.session_state.streak = 0
-if 'total_played' not in st.session_state: st.session_state.total_played = 0
-if 'wrong_words' not in st.session_state: st.session_state.wrong_words = set()
-
-# --- 4. ฟังก์ชันระบบเสียง ---
+# --- 2. ฟังก์ชันระบบเสียง ---
 def speak(text):
-    try:
-        tts = gTTS(text=text, lang='en')
-        fp = io.BytesIO()
-        tts.write_to_fp(fp)
-        fp.seek(0)
-        b64 = base64.b64encode(fp.read()).decode()
-        md = f'<audio autoplay="true"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
-        st.markdown(md, unsafe_allow_html=True)
-    except: pass
+    if text and text != "-":
+        try:
+            tts = gTTS(text=text, lang='en')
+            fp = io.BytesIO()
+            tts.write_to_fp(fp)
+            fp.seek(0)
+            b64 = base64.b64encode(fp.read()).decode()
+            md = f'<audio autoplay="true"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
+            st.markdown(md, unsafe_allow_html=True)
+        except:
+            st.error("ไม่สามารถเล่นเสียงได้ในขณะนี้")
 
-# --- 5. ฟังก์ชันโหลดข้อมูล ---
-@st.cache_data(ttl=600)
+# --- 3. โหลดข้อมูล ---
+@st.cache_data
 def load_data():
     try:
-        # พยายามโหลดจาก Google Sheets ก่อน
-        conn = st.connection("gsheets", type=GSheetsConnection)
-        return conn.read(spreadsheet=GOOGLE_SHEET_URL)
-    except:
-        # ถ้าโหลดไม่ได้ ให้โหลดจากไฟล์ vocab.csv ใน GitHub แทน
+        # ดึงข้อมูลจากไฟล์ vocab.csv ที่อยู่ใน GitHub ของคุณ
         return pd.read_csv("vocab.csv")
+    except:
+        return pd.DataFrame([{"word": "Example", "level": "A1", "pos": "N", "def_th": "ตัวอย่าง", "def_en": "Example", "synonyms": "Sample", "antonyms": "-", "example": "This is an example."}])
 
-# โหลดข้อมูลคำศัพท์
-try:
-    df = load_data()
-except:
-    st.error("ไม่พบไฟล์ข้อมูล กรุณาอัปโหลด vocab.csv ขึ้น GitHub")
-    st.stop()
+df = load_data()
 
-# --- 6. Sidebar Menu ---
+# --- 4. จัดการสถานะการเล่น (Session State) ---
+if 'score' not in st.session_state: st.session_state.score = 0
+if 'total' not in st.session_state: st.session_state.total = 0
+if 'streak' not in st.session_state: st.session_state.streak = 0
+
+# --- 5. เมนู Sidebar ---
 with st.sidebar:
-    st.title("🚀 Vocab Hero")
-    mode = st.radio("เมนูหลัก:", ["📖 เรียนรู้คำศัพท์", "🧠 ทำแบบทดสอบ", "📊 สถิติ & ใบเซอร์"])
+    st.title("🎯 Vocab Hero")
+    menu = st.radio("เลือกโหมด:", ["📖 เรียนรู้", "🧠 ทดสอบ", "🏆 ความสำเร็จ"])
     st.divider()
-    st.metric("Score", f"{st.session_state.score}/{st.session_state.total_played}")
-    st.metric("Current Streak", f"🔥 {st.session_state.streak}")
-    if st.button("Reset Stats"):
+    st.metric("คะแนนสะสม", f"{st.session_state.score}/{st.session_state.total}")
+    st.metric("Streak ปัจจุบัน", f"🔥 {st.session_state.streak}")
+    if st.button("ล้างสถิติ"):
         st.session_state.score = 0
+        st.session_state.total = 0
         st.session_state.streak = 0
-        st.session_state.total_played = 0
-        st.session_state.wrong_words = set()
         st.rerun()
 
-# --- 7. โหมดเรียนรู้ ---
-if mode == "📖 เรียนรู้คำศัพท์":
+# --- 6. โหมดเรียนรู้ ---
+if menu == "📖 เรียนรู้":
     st.header("📖 Learning Center")
-    level = st.selectbox("ระดับ CEFR", ["All"] + sorted(df['level'].unique().tolist()))
-    f_df = df if level == "All" else df[df['level'] == level]
     
-    word_choice = st.selectbox("เลือกคำศัพท์", f_df['word'])
-    w = f_df[f_df['word'] == word_choice].iloc[0]
+    col_a, col_b = st.columns([1, 2])
+    with col_a:
+        level_choice = st.selectbox("ระดับ CEFR:", ["All"] + sorted(df['level'].unique().tolist()))
+        filtered_df = df if level_choice == "All" else df[df['level'] == level_choice]
+        word_choice = st.selectbox("เลือกคำศัพท์:", filtered_df['word'])
     
-    with st.container(border=True):
-        c1, c2 = st.columns([4, 1])
-        c1.subheader(f"{w['word']} ({w['level']}) - {w['pos']}")
-        if c2.button("🔊 ฟังเสียง"): speak(w['word'])
-        
-    t1, t2, t3 = st.tabs(["ความหมาย", "Synonyms/Antonyms", "ตัวอย่าง"])
-        with t1:
-            st.write(f"🇹🇭 {w['def_th']}")
-            st.write(f"🇺🇸 {w['def_en']}")
-        with t2:
-            s_col1, s_col2 = st.columns([4, 1])
-            s_col1.write(f"✅ Synonyms: {w['synonyms']}")
-            if s_col2.button("🔊", key="s_voice"):
-                speak(w['synonyms'])
-            st.divider()
-            a_col1, a_col2 = st.columns([4, 1])
-            a_col1.write(f"❌ Antonyms: {w['antonyms']}")
-            if a_col2.button("🔊", key="a_voice"):
-                speak(w['antonyms'])
-        with t3:
-            st.info(w['example'])
-            if st.button("🔊 อ่านตัวอย่าง", key="ex_voice"):
-                speak(w['example'])
-
-# --- 8. โหมดทำแบบทดสอบ ---
-elif mode == "🧠 ทำแบบทดสอบ":
-    st.header("🧠 Quiz Challenge")
-    if len(df) < 4:
-        st.error("ต้องการคำศัพท์อย่างน้อย 4 คำเพื่อทำ Quiz")
-    else:
-        if 'q_data' not in st.session_state:
-            q_row = df.sample(1).iloc[0]
-            correct = q_row['def_th']
-            others = df[df['def_th'] != correct]['def_th'].sample(3).tolist()
-            opts = others + [correct]
-            random.shuffle(opts)
-            st.session_state.q_data = {'word': q_row['word'], 'ans': correct, 'opts': opts}
-
-        qd = st.session_state.q_data
-        st.subheader(f"คำว่า '{qd['word']}' แปลว่าอะไร?")
-        ans = st.radio("ตัวเลือก:", qd['opts'])
-        
-        if st.button("ส่งคำตอบ"):
-            st.session_state.total_played += 1
-            if ans == qd['ans']:
-                st.success("ถูกต้อง! 🎉")
-                st.session_state.score += 1
-                st.session_state.streak += 1
-                if qd['word'] in st.session_state.wrong_words:
-                    st.session_state.wrong_words.remove(qd['word'])
-            else:
-                st.error(f"ผิดครับ! คำตอบคือ: {qd['ans']}")
-                st.session_state.streak = 0
-                st.session_state.wrong_words.add(qd['word'])
+    with col_b:
+        w = filtered_df[filtered_df['word'] == word_choice].iloc[0]
+        with st.container(border=True):
+            c1, c2 = st.columns([4, 1])
+            c1.subheader(f"{w['word']} ({w['level']})")
+            c1.caption(f"Part of Speech: {w['pos']}")
+            if c2.button("🔊 ฟัง", key="main_v"): speak(w['word'])
             
-            if st.button("ข้อถัดไป ➡️"):
-                del st.session_state.q_data
-                st.rerun()
+            t1, t2, t3 = st.tabs(["ความหมาย", "Synonyms/Antonyms", "ตัวอย่างประโยค"])
+            
+            with t1:
+                st.write(f"🇹🇭 {w['def_th']}")
+                st.write(f"🇺🇸 {w['def_en']}")
+            
+            with t2:
+                # ส่วน Synonyms
+                s_c1, s_c2 = st.columns([4, 1])
+                s_c1.write(f"✅ Synonyms: {w['synonyms']}")
+                if s_c2.button("🔊", key="s_v"): speak(w['synonyms'])
+                st.divider()
+                # ส่วน Antonyms
+                a_c1, a_c2 = st.columns([4, 1])
+                a_c1.write(f"❌ Antonyms: {w['antonyms']}")
+                if a_c2.button("🔊", key="a_v"): speak(w['antonyms'])
+                
+            with t3:
+                st.info(w['example'])
+                if st.button("🔊 อ่านประโยคตัวอย่าง", key="ex_v"): speak(w['example'])
 
-# --- 9. โหมดสถิติและใบเซอร์ ---
-elif mode == "📊 สถิติ & ใบเซอร์":
-    st.header("🏆 ความสำเร็จของคุณ")
-    if st.session_state.streak >= 10:
+# --- 7. โหมดทดสอบ ---
+elif menu == "🧠 ทดสอบ":
+    st.header("🧠 Quick Quiz")
+    
+    if 'quiz_q' not in st.session_state:
+        q_row = df.sample(1).iloc[0]
+        correct = q_row['def_th']
+        distractors = df[df['def_th'] != correct]['def_th'].sample(3).tolist()
+        options = distractors + [correct]
+        random.shuffle(options)
+        st.session_state.quiz_q = {'word': q_row['word'], 'ans': correct, 'opts': options}
+
+    q = st.session_state.quiz_q
+    st.subheader(f"คำว่า '{q['word']}' แปลว่าอะไร?")
+    user_ans = st.radio("เลือกคำตอบที่ถูกต้อง:", q['opts'])
+
+    if st.button("ส่งคำตอบ"):
+        st.session_state.total += 1
+        if user_ans == q['ans']:
+            st.success("ถูกต้องยอดเยี่ยม! 🎉")
+            st.session_state.score += 1
+            st.session_state.streak += 1
+        else:
+            st.error(f"ผิดนิดเดียว! คำตอบคือ: {q['ans']}")
+            st.session_state.streak = 0
+        
+        if st.button("ข้อถัดไป ➡️"):
+            del st.session_state.quiz_q
+            st.rerun()
+
+# --- 8. โหมดความสำเร็จ ---
+elif menu == "🏆 ความสำเร็จ":
+    st.header("🏆 Achievement Board")
+    if st.session_state.streak >= 5:
         st.balloons()
-        st.markdown("""
-        <div style="text-align:center; padding:30px; border: 10px solid gold; border-radius: 15px;">
-            <h1 style="color:gold;">📜 CERTIFICATE</h1>
-            <h2>Congratulations!</h2>
-            <p>You've achieved a 10-answer streak!</p>
+        st.success("คุณได้รับเหรียญตรา: นักเรียนดีเด่น! 🎖️")
+        st.markdown(f"""
+        <div style="border: 5px solid gold; padding: 20px; text-align: center; border-radius: 15px;">
+            <h1 style="color: gold;">CERTIFICATE OF EXCELLENCE</h1>
+            <p>ขอชื่นชมที่คุณทำ Streak ได้ถึง {st.session_state.streak} ข้อ!</p>
         </div>
         """, unsafe_allow_html=True)
     else:
-        st.info(f"ทำ Streak ให้ครบ 10 เพื่อรับใบเซอร์ (ตอนนี้: {st.session_state.streak})")
-    
-    st.divider()
-    st.subheader("❌ คำศัพท์ที่ตอบผิด (ควรทบทวน)")
-    if st.session_state.wrong_words:
-        for ww in st.session_state.wrong_words:
-            st.write(f"- {ww}")
-    else:
-        st.write("ยังไม่มีคำที่ตอบผิด")
+        st.info("ทำ Streak ให้ครบ 5 ข้อเพื่อปลดล็อกใบประกาศ!")
