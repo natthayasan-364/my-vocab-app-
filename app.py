@@ -82,19 +82,19 @@ if mode == "📖 เรียนรู้คำศัพท์":
         with t1:
             st.write(f"🇹🇭 {w['def_th']}")
             st.write(f"🇺🇸 {w['def_en']}")
-                with t2:
-            # ส่วนของ Synonyms
-            col_s1, col_s2 = st.columns([4, 1])
-            col_s1.write(f"✅ Synonyms: {w['synonyms']}")
-            if col_s2.button("🔊", key="syn_btn"): 
+        with t2:
+            s_col1, s_col2 = st.columns([4, 1])
+            s_col1.write(f"✅ Synonyms: {w['synonyms']}")
+            if s_col2.button("🔊", key="s_voice"):
                 speak(w['synonyms'])
             
-            st.divider() # ขีดเส้นคั่นเล็กน้อยให้ดูง่าย
+            st.divider()
             
-            # ส่วนของ Antonyms
-            col_a1, col_a2 = st.columns([4, 1])
-            col_a1.write(f"❌ Antonyms: {w['antonyms']}")
-            if col_a2.button("🔊", key="ant_btn"): 
+            a_col1, a_col2 = st.columns([4, 1])
+            a_col1.write(f"❌ Antonyms: {w['antonyms']}")
+            if a_col2.button("🔊", key="a_voice"):
+                speak(w['antonyms'])
+y="ant_btn"): 
                 speak(w['antonyms'])
         with t3:
             st.info(w['example'])
