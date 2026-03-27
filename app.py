@@ -6,7 +6,7 @@ import io
 import random
 
 # --- 1. ตั้งค่าหน้าจอ ---
-st.set_page_config(page_title="CEFR Vocab Hero", page_icon="🎓", layout="wide")
+st.set_page_config(page_title="CEFR Vocab Hero Pro", page_icon="🎓", layout="wide")
 
 # --- 2. ฟังก์ชันเล่นเสียง ---
 def speak(text, unique_key):
@@ -17,7 +17,6 @@ def speak(text, unique_key):
             tts.write_to_fp(fp)
             fp.seek(0)
             b64 = base64.b64encode(fp.read()).decode()
-            # ใช้ unique_key เพื่อให้ HTML element ไม่ซ้ำกัน
             md = f'<audio autoplay="true" key="{unique_key}"><source src="data:audio/mp3;base64,{b64}" type="audio/mp3"></audio>'
             st.markdown(md, unsafe_allow_html=True)
         except:
@@ -29,10 +28,12 @@ def load_data():
     try:
         return pd.read_csv("vocab.csv")
     except:
+        # ข้อมูลตัวอย่างหากโหลดไฟล์ไม่ได้
         return pd.DataFrame([{
             "word": "Believe", "level": "A2", "pos": "V", 
             "def_th": "เชื่อ", "def_en": "To think that something is true",
-            "synonyms": "Trust", "antonyms": "Doubt", 
+            "synonyms": "Trust", "synonyms_th": "ไว้ใจ",
+            "antonyms": "Doubt", "antonyms_th": "สงสัย",
             "example": "I believe you.", "example_th": "ฉันเชื่อคุณ"
         }])
 
@@ -47,7 +48,7 @@ with st.sidebar:
     st.title("🎯 Vocab Hero")
     menu = st.radio("เลือกโหมด:", ["📖 เรียนรู้", "🧠 ทดสอบ"])
     st.divider()
-    st.metric("คะแนน", f"{st.session_state.score}/{st.session_state.total}")
+    st.metric("คะแนนของคุณ", f"{st.session_state.score}/{st.session_state.total}")
 
 # --- 6. โหมดเรียนรู้ ---
 if menu == "📖 เรียนรู้":
@@ -77,13 +78,21 @@ if menu == "📖 เรียนรู้":
             with t2:
                 # Synonyms
                 s1, s2 = st.columns([4, 1])
-                s1.write(f"✅ Synonyms: {w['synonyms']}")
+                s_text = f"✅ Synonyms: **{w['synonyms']}**"
+                if 'synonyms_th' in w and pd.notna(w['synonyms_th']):
+                    s_text += f" ({w['synonyms_th']})"
+                s1.write(s_text)
                 if s2.button("🔊", key="btn_syn"): 
                     speak(w['synonyms'], "audio_syn")
+                
                 st.divider()
+                
                 # Antonyms
                 a1, a2 = st.columns([4, 1])
-                a1.write(f"❌ Antonyms: {w['antonyms']}")
+                a_text = f"❌ Antonyms: **{w['antonyms']}**"
+                if 'antonyms_th' in w and pd.notna(w['antonyms_th']):
+                    a_text += f" ({w['antonyms_th']})"
+                a1.write(a_text)
                 if a2.button("🔊", key="btn_ant"): 
                     speak(w['antonyms'], "audio_ant")
                 
