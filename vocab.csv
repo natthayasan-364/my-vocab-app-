@@ -1,11 +1,11 @@
-word,level,pos,def_th,def_en,synonyms,antonyms,example
-Apple,A1,Noun,แอปเปิ้ล,A round fruit with red or green skin,Fruit,-,I eat an apple every morning.
-Beautiful,A1,Adj.,สวยงาม,Pleasing to the senses,Pretty,Ugly,The flowers are very beautiful.
-Frequent,A2,Adj.,บ่อย,Happening often,Regular,Rare,He is a frequent visitor to this library.
-Essential,B1,Adj.,จำเป็น,Absolutely necessary,Vital,Optional,Water is essential for living things.
-Analyze,B2,Verb,วิเคราะห์,Examine in detail,Examine,Ignore,We need to analyze the data carefully.
-Abundant,B2,Adj.,มากมาย,Available in large quantities,Plentiful,Scarce,The region has abundant natural resources.
-Ambiguous,C1,Adj.,กำกวม,Open to more than one interpretation,Unclear,Clear,The ending of the movie was ambiguous.
-Diminish,C1,Verb,ลดลง,Make or become less,Decline,Increase,The pain will gradually diminish.
-Eloquent,C2,Adj.,ซึ่งมีวาทศิลป์,Fluent or persuasive in speaking,Articulate,Inarticulate,She made an eloquent speech at the wedding.
-Pragmatic,C2,Adj.,เน้นการปฏิบัติจริง,Dealing with things sensibly,Practical,Idealistic,We need a pragmatic solution to this problem.
+word,level,pos,def_th,def_en,synonyms,antonyms,example,example_th
+Apple,A1,Noun,แอปเปิ้ล,A round fruit with red or green skin,Fruit,-,I eat an apple every morning., ฉันกินแอปเปิ้ลทุกเช้า.
+Beautiful,A1,Adj.,สวยงาม,Pleasing to the senses,Pretty,Ugly,The flowers are very beautiful.,ดอกไม้เหล่านี้สวยมาก.
+Frequent,A2,Adj.,บ่อย,Happening often,Regular,Rare,He is a frequent visitor to this library.,เขาเป็นผู้มาเยือนห้องสมุดแห่งนี้บ่อยครั้ง.
+Essential,B1,Adj.,จำเป็น,Absolutely necessary,Vital,Optional,Water is essential for living things.,น้ำสำคัญต่อสิ่งมีชีวิต.
+Analyze,B2,Verb,วิเคราะห์,Examine in detail,Examine,Ignore,We need to analyze the data carefully.,เราจำเป็นต้องวิเคราะห์ข้อมูลอย่างระมัดระวัง.
+Abundant,B2,Adj.,มากมาย,Available in large quantities,Plentiful,Scarce,The region has abundant natural resources.,ภูมิภาคนี้มีทรัพยากรธรรมชาติอุดมสมบูรณ์.
+Ambiguous,C1,Adj.,กำกวม,Open to more than one interpretation,Unclear,Clear,The ending of the movie was ambiguous.,ตอนจบของภาพยนตร์เรื่องนี้คลุมเครือ.
+Diminish,C1,Verb,ลดลง,Make or become less,Decline,Increase,The pain will gradually diminish.,อาการปวดจะค่อยๆ บรรเทาลง.
+Eloquent,C2,Adj.,ซึ่งมีวาทศิลป์,Fluent or persuasive in speaking,Articulate,Inarticulate,She made an eloquent speech at the wedding.,เธอได้กล่าวสุนทรพจน์ที่ไพเราะมากในงานแต่งงาน.
+Pragmatic,C2,Adj.,เน้นการปฏิบัติจริง,Dealing with things sensibly,Practical,Idealistic,We need a pragmatic solution to this problem.,เราต้องการวิธีแก้ปัญหาที่เป็นรูปธรรมสำหรับปัญหานี้.
