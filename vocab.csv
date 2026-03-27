@@ -1,7 +1,7 @@
 word,level,pos,def_th,def_en,synonyms,synonyms_th,antonyms,antonyms_th,example,example_th
 Apple,A1,Noun,แอปเปิ้ล,A round fruit with red or green skin,Fruit,ผลไม้,-,-,I eat an apple every morning., ฉันกินแอปเปิ้ลทุกเช้า.
 Beautiful,A1,Adj.,สวยงาม,Pleasing to the senses,Pretty,สวย,Ugly,น่าเกลียด,The flowers are very beautiful.,ดอกไม้เหล่านี้สวยมาก.
-requent,A2,Adj.,บ่อย,Happening often,Regular,ปกติ,Rare,นานๆครั้ง,He is a frequent visitor to this library.,เขาเป็นผู้มาเยือนห้องสมุดแห่งนี้บ่อยครั้ง.
+Frequent,A2,Adj.,บ่อย,Happening often,Regular,ปกติ,Rare,นานๆครั้ง,He is a frequent visitor to this library.,เขาเป็นผู้มาเยือนห้องสมุดแห่งนี้บ่อยครั้ง.
 Essential,B1,Adj.,จำเป็น,Absolutely necessary,Vital,จำเป็น,Optional,ไม่จำเป็น,Water is essential for living things.,น้ำสำคัญต่อสิ่งมีชีวิต.
 Analyze,B2,Verb,วิเคราะห์,Examine in detail,Examine,วิเคราะห์,Ignore,ไม่สนใจ,We need to analyze the data carefully.,เราจำเป็นต้องวิเคราะห์ข้อมูลอย่างระมัดระวัง.
 Abundant,B2,Adj.,มากมาย,Available in large quantities,Plentiful,ที่มากมาย,Scarce,ขาดแคลน,The region has abundant natural resources.,ภูมิภาคนี้มีทรัพยากรธรรมชาติอุดมสมบูรณ์.
